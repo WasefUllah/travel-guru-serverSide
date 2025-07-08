@@ -42,7 +42,6 @@ async function run() {
     });
 
     app.post("/packages", async (req, res) => {
-      console.log(req.body);
       const package = await packageCollection.insertOne(req.body);
       res.send(package);
     });
@@ -78,13 +77,42 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/package/:id", async (req, res) => {
+      const result = await packageCollection.findOne({
+        _id: new ObjectId(req.params.id),
+      });
+      res.send(result);
+    });
+
     app.get("/viewPackages/:id", async (req, res) => {
-      console.log(req.params.id);
+  
       const result = await packageCollection
         .find({ destination: req.params.id })
         .toArray();
 
-      console.log(result);
+      res.send(result);
+    });
+
+    app.get("/relatedPackages/:id", async (req, res) => {
+
+      const relatedPackages = await packageCollection
+        .find({ destination: req.params.id })
+        .toArray();
+      res.send(relatedPackages);
+    });
+
+    // PUT APIs
+
+    // PATCH APIs
+
+    // DELETE APIs
+
+    app.delete("/destinations/:id", async (req, res) => {
+      const id = req.params.id;
+ 
+      const result = await destinationCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
       res.send(result);
     });
 
