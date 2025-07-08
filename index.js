@@ -88,7 +88,7 @@ async function run() {
       const sslcz = new SSLCommerzPayment(store_id, store_password, is_live);
       sslcz.init(data).then((apiResponse) => {
         // Redirect the user to payment gateway
-       
+
         let GatewayPageURL = apiResponse.GatewayPageURL;
         res.send({ url: GatewayPageURL });
         console.log("Redirecting to: ", GatewayPageURL);
@@ -167,7 +167,14 @@ async function run() {
     });
 
     app.get("/packages", async (req, res) => {
-      const result = await packageCollection.find().toArray();
+      const email = req.query.email;
+
+      let query = {};
+      if (email) {
+        query = { email };
+      }
+
+      const result = await packageCollection.find(query).toArray();
       res.send(result);
     });
 
@@ -180,7 +187,7 @@ async function run() {
 
     app.get("/viewPackages/:id", async (req, res) => {
       const result = await packageCollection
-        .find({ destination: req.params.id })
+        .find({ destinationId: req.params.id })
         .toArray();
 
       res.send(result);
@@ -191,6 +198,29 @@ async function run() {
         .find({ destination: req.params.id })
         .toArray();
       res.send(relatedPackages);
+    });
+
+    app.get("/viewBookingsManager", async (req, res) => {
+      const email = req.query.email;
+      const filter = req.query.filter; // this is packageId (optional)
+      if (!email) {
+        return res.status(400).json({ error: "Email is required" });
+      }
+      try {
+        const query = {
+          status: "paid",
+          managerEmail: email,
+        };
+
+        if (filter) {
+          query.packageId = filter;
+        }
+        const bookings = await bookingCollection.find(query).toArray();
+        res.status(200).json(bookings);
+      } catch (error) {
+        console.error("Error fetching bookings for manager:", error);
+        res.status(500).json({ error: "Internal server error" });
+      }
     });
 
     app.get("/relatedBookings/:id", async (req, res) => {
