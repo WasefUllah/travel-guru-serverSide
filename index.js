@@ -51,7 +51,7 @@ async function run() {
       const pendingBooking = {
         ...booking,
         tran_id,
-        status: "pending",
+        status: "failed",
       };
       const result = await bookingCollection.insertOne(pendingBooking);
 
@@ -109,11 +109,11 @@ async function run() {
         const booking = await bookingCollection.findOne({
           tran_id: tranId,
         });
-        // console.log(registration);
-        // const result = await packageCollection.updateOne(
-        //   { _id: new ObjectId(registration.marathonId) },
-        //   { $inc: { booked: 1 } }
-        // );
+        console.log();
+        const result = await packageCollection.updateOne(
+          { _id: new ObjectId(booking.packageId) },
+          { $inc: { booked: 1 } }
+        );
 
         res.redirect(`${clientUrl}/success/${tranId}`);
       } else {
@@ -195,7 +195,7 @@ async function run() {
 
     app.get("/relatedPackages/:id", async (req, res) => {
       const relatedPackages = await packageCollection
-        .find({ destination: req.params.id })
+        .find({ destinationId: req.params.id })
         .toArray();
       res.send(relatedPackages);
     });
@@ -236,6 +236,13 @@ async function run() {
         console.error("Error fetching bookings for manager:", error);
         res.status(500).json({ error: "Internal server error" });
       }
+    });
+
+    app.get("/paymentHistory", async (req, res) => {
+      const result = await bookingCollection
+        .find({ userEmail: req.query.email })
+        .toArray();
+      res.send(result);
     });
 
     // PUT APIs
