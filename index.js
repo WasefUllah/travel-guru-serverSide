@@ -249,6 +249,27 @@ async function run() {
 
     // PATCH APIs
 
+    app.patch("/package/:id", async (req, res) => {
+      const updatedFields = req.body;
+      if (!updatedFields) {
+        const existingResult = await packageCollection.findOne({
+          _id: new ObjectId(req.params.id),
+        });
+
+        const updated = await packageCollection.updateOne(
+          { _id: existingResult._id },
+          { $set: { popular: !existingResult.popular } }
+        );
+        res.send(updated);
+      } else {
+        const result = await packageCollection.updateOne(
+          { _id: new ObjectId(req.params.id) },
+          { $set: updatedFields }
+        );
+        res.send(result);
+      }
+    });
+
     // DELETE APIs
 
     app.delete("/destinations/:id", async (req, res) => {
