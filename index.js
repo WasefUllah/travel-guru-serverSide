@@ -185,6 +185,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/approvedPackage", async (req, res) => {
+      const result = await packageCollection
+        .find({ approved: false })
+        .toArray();
+      res.send(result);
+    });
+
     app.get("/viewPackages/:id", async (req, res) => {
       const result = await packageCollection
         .find({ destinationId: req.params.id })
