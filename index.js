@@ -169,7 +169,7 @@ async function run() {
     app.get("/packages", async (req, res) => {
       const email = req.query.email;
 
-      let query = {};
+      let query = { approved: true };
       if (email) {
         query = { email };
       }
@@ -189,6 +189,11 @@ async function run() {
       const result = await packageCollection
         .find({ approved: false })
         .toArray();
+      res.send(result);
+    });
+
+    app.get("/packagesList", async (req, res) => {
+      const result = await packageCollection.find().toArray();
       res.send(result);
     });
 
