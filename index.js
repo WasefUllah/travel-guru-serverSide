@@ -38,8 +38,16 @@ async function run() {
     const destinationCollection = database.collection("destinations");
     const packageCollection = database.collection("packages");
     const bookingCollection = database.collection("bookings");
+    const faqCollection = database.collection("faqs");
 
     // POST APIs
+
+    app.post("/faq", async (req, res) => {
+      const { question, answer } = req.body;
+      const result = await faqCollection.insertOne({ question, answer });
+      res.send(result);
+    });
+
     app.post("/bookings", async (req, res) => {
       const booking = req.body;
 
@@ -141,6 +149,10 @@ async function run() {
     });
 
     // GET APIs
+    app.get("/faq", async (req, res) => {
+      const result = await faqCollection.find().toArray();
+      res.send(result);
+    });
 
     app.get("/users", async (req, res) => {
       const email = req.query.email;
