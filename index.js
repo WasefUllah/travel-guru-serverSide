@@ -169,12 +169,32 @@ async function run() {
     app.get("/packages", async (req, res) => {
       const email = req.query.email;
 
-      let query = { approved: true };
       if (email) {
-        query = { email };
+        query = { userEmail: email };
       }
 
-      const result = await packageCollection.find(query).toArray();
+      const result = await bookingCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    app.get("/allPackages", async (req, res) => {
+      const result = await packageCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.get("/popularDestination", async (req, res) => {
+      const result = await destinationCollection
+        .find({ popular: true })
+        .limit(6)
+        .toArray();
+      res.send(result);
+    });
+
+    app.get("/popularPackage", async (req, res) => {
+      const result = await packageCollection
+        .find({ popular: true })
+        .limit(6)
+        .toArray();
       res.send(result);
     });
 
@@ -193,13 +213,14 @@ async function run() {
     });
 
     app.get("/packagesList", async (req, res) => {
-      const result = await packageCollection.find().toArray();
+      const email = req.query.email;
+      const result = await packageCollection.find({ email: email }).toArray();
       res.send(result);
     });
 
     app.get("/viewPackages/:id", async (req, res) => {
       const result = await packageCollection
-        .find({ destinationId: req.params.id })
+        .find({ destinationId: req.params.id, approved: true })
         .toArray();
 
       res.send(result);
