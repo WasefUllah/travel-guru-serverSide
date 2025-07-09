@@ -200,18 +200,33 @@ async function run() {
       res.send(relatedPackages);
     });
 
-    app.get("/viewBookingsManager", async (req, res) => {
+    app.get("/relatedBookings/:id", async (req, res) => {
+      const relatedBookings = await bookingCollection
+        .find({ packageId: req.params.id })
+        .toArray();
+      res.send(relatedBookings);
+    });
+
+    app.get("/bookings", async (req, res) => {
       const email = req.query.email;
-      const filter = req.query.filter; // this is packageId (optional)
+      const filter = req.query.filter;
+      const role = req.query.role;
+      let query = {};
       if (!email) {
         return res.status(400).json({ error: "Email is required" });
       }
       try {
-        const query = {
-          status: "paid",
-          managerEmail: email,
-        };
-
+        if (role == "manager") {
+          query = {
+            status: "paid",
+            managerEmail: email,
+          };
+        } else if (role == "customer") {
+          query = {
+            status: "paid",
+            userEmail: email,
+          };
+        }
         if (filter) {
           query.packageId = filter;
         }
@@ -221,13 +236,6 @@ async function run() {
         console.error("Error fetching bookings for manager:", error);
         res.status(500).json({ error: "Internal server error" });
       }
-    });
-
-    app.get("/relatedBookings/:id", async (req, res) => {
-      const relatedBookings = await bookingCollection
-        .find({ package: req.params.id })
-        .toArray();
-      res.send(relatedBookings);
     });
 
     // PUT APIs
