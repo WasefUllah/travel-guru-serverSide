@@ -13,8 +13,8 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster
 
 const SSLCommerzPayment = require("sslcommerz-lts");
 // sslcommerz
-const serverUrl = "http://localhost:3000";
-const clientUrl = "http://localhost:5173";
+const serverUrl = "https://travel-guru-server-coral.vercel.app";
+const clientUrl = "https://travel-guru-795b7.web.app";
 const store_id = process.env.STORE_ID;
 const store_password = process.env.STORE_PASS;
 const is_live = false;
