@@ -99,7 +99,7 @@ async function run() {
 
         let GatewayPageURL = apiResponse.GatewayPageURL;
         res.send({ url: GatewayPageURL });
-        console.log("Redirecting to: ", GatewayPageURL);
+        // console.log("Redirecting to: ", GatewayPageURL);
       });
     });
 
@@ -113,11 +113,10 @@ async function run() {
 
       if (result.modifiedCount > 0) {
         // res.send(result);
-        console.log(`Transaction ${tranId} marked as paid`);
+        // console.log(`Transaction ${tranId} marked as paid`);
         const booking = await bookingCollection.findOne({
           tran_id: tranId,
         });
-        console.log();
         const result = await packageCollection.updateOne(
           { _id: new ObjectId(booking.packageId) },
           { $inc: { booked: 1 } }
@@ -180,13 +179,16 @@ async function run() {
 
     app.get("/packages", async (req, res) => {
       const email = req.query.email;
-
+      let query = {};
       if (email) {
         query = { userEmail: email };
+        const result = await bookingCollection.find(query).toArray();
+        res.send(result);
+      } else {
+        query = { approved: true };
+        const result = await packageCollection.find(query).toArray();
+        res.send(result);
       }
-
-      const result = await bookingCollection.find(query).toArray();
-      res.send(result);
     });
 
     app.get("/allPackages", async (req, res) => {
@@ -361,10 +363,10 @@ async function run() {
     });
 
     // Send a ping to confirm a successful connection
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!"
-    );
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!"
+    // );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
