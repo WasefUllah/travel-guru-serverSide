@@ -155,6 +155,7 @@ async function run() {
 
     app.get("/users", async (req, res) => {
       const email = req.query.email;
+
       if (!email) {
         return res.status(400).json({ error: "Email query param is required" });
       }
@@ -164,7 +165,7 @@ async function run() {
         if (user) {
           res.status(200).json({ exists: true, user });
         } else {
-          res.status(404).json({ exists: false, user: null });
+          res.json({ exists: false, user: null });
         }
       } catch (error) {
         console.error("Error fetching user:", error);
